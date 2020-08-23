@@ -1,0 +1,263 @@
+Option Explicit
+
+Public dateFound As Date
+
+Public columnToSearch As Integer
+Public columnToWrite As Integer
+Public countFound As Integer
+Public firstRow As Integer
+Public i As Integer
+Public iCntr As Integer
+Public lastRowUsed As Integer
+Public numRows As Integer
+Public rowToTest As Integer
+Public rowToTestDate As Integer
+Public rowToTestName As Integer
+Public rowToTestAcct As Integer
+Public rowToWrite As Integer
+Public thisCol As Integer
+Public thisRow As Integer
+
+Public startTime As Double
+
+'Public rowToTest as Long
+'Public firstRow As Long
+'Public lastRowUsed As Long
+
+Public aCell As Range
+Public bCell As Range
+Public lowerRng As Range
+Public myRange As Range
+Public oRange As Range
+Public rng As Range
+Public upperRng As Range
+
+Public tbl As ListObjects
+
+Public carryPercent As Single
+
+Public carryType As String
+Public coderFound As String
+Public facilityFound As String
+Public firstCell As String
+Public FoundAt As String
+Public lastCell As String
+Public minutesElapsed As String
+Public SearchString As String
+Public tableName As String
+Public textToFill As String
+Public thisVal As String
+Public trimResult As String
+Public splitResult() As String
+Public typeFound As String
+
+Public ws As Worksheet
+
+Public Declare PtrSafe Function MessageBox Lib "User32" Alias "MessageBoxA" _
+    (ByVal hWnd As Long, ByVal lpText As String, _
+    ByVal lpCaption As String, ByVal wType As Long) As Long
+    
+Public Sub ColumnWidth()
+    Columns("A:N").AutoFit
+End Sub
+
+Public Sub CopySheet()
+
+  ActiveWorkbook.ActiveSheet.Copy before:=ActiveSheet
+    Sheets(1).Activate
+End Sub
+
+Public Sub DeleteRow()
+
+    Rows("1:1").EntireRow.Delete shift:=xlUp
+End Sub
+
+Public Sub DeleteBlankRows()
+firstCell = "A1"
+lastCell = "A" & CStr(lastRowUsed)
+
+    Range(firstCell, lastCell).SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+End Sub
+
+Public Sub DeleteBlankTableRows()
+Set rng = ActiveSheet.ListObjects(1).Range
+
+    For iCntr = rng.Row + rng.Rows.Count - 1 To rng.Row Step -1
+        If Application.WorksheetFunction.CountA(Rows(iCntr)) = 0 Then Rows(iCntr).EntireRow.Delete
+    Next
+End Sub
+  
+Public Sub deleteTabsAllButLast()
+
+Application.DisplayAlerts = False
+
+    For Each Worksheet In ActiveWorkbook.Worksheets
+        Select Case UCase(ActiveSheet.Name)
+        
+        Case "READY TO AUDIT"
+        'do nothing
+        
+        Case Else
+        ActiveSheet.Delete
+        
+        End Select
+    Next
+
+Application.DisplayAlerts = True
+End Sub
+  
+Public Sub DeleteTotals()
+
+        'For rowToTest = Cells(Rows.Count, 1).End(xlUp).Row To 1 Step -1
+         For rowToTest = Cells(Rows.Count, columnToSearch).End(xlUp).Row To 1 Step -1
+            With ActiveSheet.Cells(rowToTest, columnToSearch)
+                If .Value Like "*Totals*" Then
+                    .EntireRow.Delete
+                End If
+            End With
+        Next rowToTest
+End Sub
+
+Public Function IsAlpha(strValue As String) As Boolean
+'Define values of Alpha category
+
+    IsAlpha = strValue Like WorksheetFunction.Rept("[a-zA-Z]", Len(strValue))
+End Function
+
+Public Sub MoveText()
+
+        'For rowToTest = Cells(Rows.Count, 1).End(xlUp).Row To 1 Step -1
+         For rowToTest = Cells(Rows.Count, columnToSearch).End(xlUp).Row To 1 Step -1
+            With ActiveSheet.Cells(rowToTest, columnToSearch)
+                If .Value Like SearchString Then
+                    facilityFound = .Value
+                    .Offset(rowToWrite, columnToWrite).Value = facilityFound
+                    .Value = ""
+                End If
+            End With
+        Next rowToTest
+End Sub
+
+Public Sub NextUnique()
+
+GoAgain:
+    thisRow = thisRow + 1
+        If thisRow > ActiveSheet.ListObjects(1).Range.Rows.Count Then
+            Exit Sub
+        End If
+            If Cells(thisRow, thisCol).Value = thisVal Then
+                GoTo GoAgain
+            Else
+                Cells(thisRow, thisCol).Activate
+            End If
+End Sub
+
+Public Sub NoFormattingAll()
+
+    ActiveSheet.Cells.ClearFormats
+End Sub
+
+Public Sub trimAll()
+
+    For rowToTest = Cells(Rows.Count, 10).End(xlUp).Row To 1 Step -1
+            With ActiveSheet.Cells(rowToTest, 10)
+                .Value = WorksheetFunction.Trim(Cells(rowToTest, 10).Value)
+            End With
+    Next rowToTest
+End Sub
+
+Public Sub UnMergeAll()
+
+    ActiveWorkbook.ActiveSheet.Cells.UnMerge
+End Sub
+
+Sub WorkingLoop()
+    'Dim oRange As Range, aCell As Range, bCell As Range
+    'Dim ws As Worksheet
+    'Dim SearchString As String, FoundAt As String
+    
+    On Error GoTo Whoa
+    
+    'Set ws = Worksheets("xxxxxxxx Cleanup")
+    'Set oRange = ws.Columns(2)
+    'SearchString = "tarantinoevents.com"
+    
+    Set aCell = oRange.Find(What:=SearchString, LookIn:=xlValues, _
+                LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+                MatchCase:=False, SearchFormat:=False)
+                
+    If Not aCell Is Nothing Then
+        Set bCell = aCell
+        FoundAt = aCell.Address
+        Do
+            aCell.Interior.Color = RGB(255, 255, 0)
+            Set aCell = oRange.FindNext(After:=aCell)
+ 
+            If Not aCell Is Nothing Then
+                If aCell.Address = bCell.Address Then Exit Do
+                FoundAt = FoundAt & ", " & aCell.Address
+            Else
+                Exit Do
+            End If
+        Loop
+    Else
+        MsgBox SearchString & " not Found"
+        Exit Sub
+    End If
+    
+    MsgBox "The Search String has been found these locations: " & FoundAt
+    Exit Sub
+        
+Whoa:
+    MsgBox Err.Description
+End Sub
+
+Public Sub WorkingRowToTest()
+
+    Range("C1").Activate
+    'Range("C1").Activate
+    'Range(tableName & "[#All]").Select
+    'ActiveWorkbook.Worksheets(Sheets.Count).ListObject(1).Select
+    Selection.ListObject.ListRows.Add
+    i = 1
+    For rowToTest = Cells(ActiveSheet.Range.Rows.Count, 1).End(xlUp).Row To 1 Step -1
+        With ActiveSheet.Range(rowToTest, 1)
+            If i = 1 Then
+            thisVal = ActiveCell.Value
+            thisRow = ActiveCell.Row
+            thisCol = ActiveCell.Column
+            
+                Call NextUnique
+                    coderFound = ActiveCell.Value
+                    Set upperRng = ActiveCell.Offset(0, 5)
+                    thisVal = ActiveCell.Value
+                    thisRow = ActiveCell.Row
+                    thisCol = ActiveCell.Column
+                    
+                Call NextUnique
+                    Set lowerRng = ActiveCell.Offset(-1, 5)
+                Range(upperRng.Address, lowerRng.Address).Value = Application.WorksheetFunction.CountIf(Range(upperRng.Address, lowerRng.Address).Offset(0, -5), coderFound)
+            Else
+                    coderFound = ActiveCell.Value
+                    Set upperRng = ActiveCell.Offset(0, 5)
+                    thisVal = ActiveCell.Value
+                    thisRow = ActiveCell.Row
+                    thisCol = ActiveCell.Column
+                    
+                Call NextUnique
+                    If ActiveCell.Value = "" Then
+                        Set lowerRng = ActiveCell.Offset(-1, 5)
+                        Range(upperRng.Address, lowerRng.Address).Value = Application.WorksheetFunction.CountIf(Range(upperRng.Address, lowerRng.Address).Offset(0, -5), coderFound)
+                            Exit Sub
+                    Else
+                        Set lowerRng = ActiveCell.Offset(-1, 5)
+                        Range(upperRng.Address, lowerRng.Address).Value = Application.WorksheetFunction.CountIf(Range(upperRng.Address, lowerRng.Address).Offset(0, -5), coderFound)
+                    End If
+            End If
+        End With
+    i = 2
+    Next rowToTest
+End Sub
+
+
+
