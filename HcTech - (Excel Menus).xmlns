@@ -1,0 +1,50 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui"
+  xmlns:x="myNameSpace">
+	<ribbon>
+		<tabs>
+			<tab idQ="TabHCTec" label="HCTec" insertAfterMso="TabDeveloper">
+				<group idQ="x:Xxxxx" label="Auditor's Toolset">
+					<button id="C1" label="Data Entry" size="large" imageMso="FormControlEditBox" onAction="RUN_DATAENTRY" />
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
+</customUI>
+
+
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui"
+  xmlns:x="myNameSpace">
+	<ribbon>
+		<tabs>
+		
+			<tab idQ="TabHCTec">
+				<group id="x:XxxxxManager" label="Audit Manager's Toolset">
+					<button id="C2" label="test" size="large" imageMso="FileSave" onAction="IMPORT_XXXX" />
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
+</customUI>
+
+
+
+
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui"
+  xmlns:x="myNameSpace">
+	<ribbon>
+		<tabs>
+			<tab id="TabHCTec2" label="HCTec2" insertAfterMso="TabDeveloper">
+				<group idQ="x:XxxxxManager" label="Tools">
+					<button id="C6" label="Rename Tabs for Import" size="large" imageMso="R" onAction="RENAME_TABS" />
+				</group>
+				
+<group idQ="x:XxxxxManager2" label="Import Routines">
+					<button id="C2" label="Xxxx" size="large" imageMso="ImportTextFile" onAction="IMPORT_XXXX" />
+					<button id="C3" label="Xxxxxx" size="large" imageMso="ImportExcel" onAction="IMPORT_XXXXXX" />
+					<button id="C4" label="Xxxxxx" size="large" imageMso="ImportExcel" onAction="IMPORT_XXXXXX" />
+					<button id="C5" label="Xxxxxxxxxx" size="large" imageMso="ImportExcel" onAction="IMPORT_XXXXXXXXXX" />
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
+</customUI>
