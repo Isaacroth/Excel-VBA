@@ -1,0 +1,127 @@
+
+Public Sub ADD_TABS_X10(control As IRibbonControl)
+
+i = 1
+    Do Until i = 10
+    ActiveSheet.Select
+    ActiveSheet.Copy After:=ActiveSheet
+i = i + 1
+Loop
+End Sub
+
+'Public Sub COUNT_UNIQUE_NAME()
+Public Sub COUNT_UNIQUE_NAME(control As IRibbonControl)
+Dim myArray(300) As String
+    
+   ' With ActiveSheet
+        Columns("A:Z").Sort key1:=Range("C2"), order1:=xlAscending, Header:=xlYes
+        lastRowUsed = Range("C2").End(xlDown).Row
+        Range("C1").Activate
+   ' End With
+
+thisVal = ActiveCell.Value
+thisCol = ActiveCell.Column
+thisRow = ActiveCell.Row
+
+i = 1
+ 
+GoAgain:
+    thisRow = thisRow + 1
+        If thisRow > lastRowUsed Then
+            GoTo report
+        End If
+            If Cells(thisRow, thisCol).Value = thisVal Then
+                GoTo GoAgain
+            Else
+                Cells(thisRow, thisCol).Activate
+                thisVal = ActiveCell.Value
+            End If
+ 
+        myArray(i) = thisVal
+        
+        If i < lastRowUsed Then
+        i = i + 1
+        GoTo GoAgain
+        End If
+        
+report:
+ 
+        For j = LBound(myArray) To UBound(myArray)
+               msg = msg & myArray(j) & "    "
+               'vbNewLine
+           Next j
+           MessageBox &H0, "The names off all unique patients are: " & vbNewLine & vbNewLine & msg, "Unique Patient Records", vbSystemModal
+      
+End Sub
+
+Public Sub REMOVE_NAMES(control As IRibbonControl)
+    For i = Names.Count To 1 Step -1
+        Names(i).Delete
+    Next i
+End Sub
+
+Public Sub RENAME_TABS(control As IRibbonControl)
+Dim wb As String
+wb = ActiveWorkbook.Name
+
+    For i = Sheets.Count To 2 Step -1
+        Sheets(i).Delete
+    Next i
+        Sheets(1).Copy After:=Sheets(1)
+        Sheets(1).Name = "READY TO AUDIT"
+        Sheets(2).Name = Left(wb, Len(wb) - 5)
+        Sheets(1).Activate
+End Sub
+
+Public Sub REPLACE_FORMULAS(control As IRibbonControl)
+Dim wbsource As Workbook
+Dim wbtarget As Workbook
+Dim ws As Worksheet
+
+
+Set wbsource = Workbooks("xxxxxx Audit Log v3.xlsx")
+Set wbtarget = Workbooks("XXXXXXXXXX JAN 2016 OP 3.29.16.xlsx")
+
+
+    wbsource.Activate
+    Range("I3").Copy
+
+    wbtarget.Activate
+    ActiveSheet.Paste Destination:=ActiveSheet.Range("I3")
+    Application.CutCopyMode = False
+    Range("I3").AutoFill Destination:=Range("I3:I32")
+    
+'---
+    
+    wbsource.Activate
+    Range("R3").Copy
+    
+    wbtarget.Activate
+    ActiveSheet.Paste Destination:=ActiveSheet.Range("R3")
+    Application.CutCopyMode = False
+    Range("R3").AutoFill Destination:=Range("R3:R32")
+    
+'---
+    
+    wbsource.Activate
+    Range("Z3").Copy
+    
+    wbtarget.Activate
+    ActiveSheet.Paste Destination:=ActiveSheet.Range("Z3")
+    Application.CutCopyMode = False
+    Range("Z3").AutoFill Destination:=Range("Z3:Z32")
+
+'---
+
+    wbsource.Activate
+    Range("AF3:AJ3").Copy
+    
+
+    wbtarget.Activate
+    ActiveSheet.Paste Destination:=ActiveSheet.Range("AF3:AJ3")
+    Application.CutCopyMode = False
+    Range("AF3:AJ3").AutoFill Destination:=Range("AF3:AJ32")
+    
+
+End Sub
+
